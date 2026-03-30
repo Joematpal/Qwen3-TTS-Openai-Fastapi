@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: qwen3-tts-api
+    runtime: nvidia
     network_mode: host
     ports:
       - "8880:8880"
@@ -18,8 +19,7 @@ services:
       - CORS_ORIGINS=*
       - TTS_BACKEND=official
       - TTS_WARMUP_ON_START=false
-      # When using device_ids filter, the GPU appears as device 0 inside container
-      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=1
       - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       # Mount model cache for persistence
