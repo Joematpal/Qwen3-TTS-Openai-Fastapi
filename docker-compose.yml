@@ -33,7 +33,7 @@ services:
               capabilities: [gpu]
     restart: unless-stopped
     networks:
-      - tts-internal
+      - shared-net
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8880/health"]
       interval: 30s
@@ -66,7 +66,7 @@ services:
       - qwen3-tts-gpu
     restart: unless-stopped
     networks:
-      - tts-internal
+      - shared-net
 
   # GPU-enabled service with vLLM-Omni backend
   qwen3-tts-vllm:
@@ -139,8 +139,9 @@ services:
       - cpu
 
 networks:
-  tts-internal:
-    driver: bridge
+  shared-net:
+    external: true
+
 
 # To run GPU version with official backend: docker-compose up qwen3-tts-gpu oauth2-proxy
 # To run GPU version with vLLM backend: docker-compose --profile vllm up qwen3-tts-vllm
