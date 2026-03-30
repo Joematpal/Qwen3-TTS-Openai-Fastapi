@@ -20,7 +20,7 @@ tts:
 		--output speech.mp3
 
 clone:
-	$(eval B64 := $(shell base64 -w0 $(REF_AUDIO)))
+	$(eval B64 := $(base64 -w0 $(REF_AUDIO)))
 	curl -X POST http://$(HOST):$(PORT)/v1/audio/voice-clone \
 		-H "Content-Type: application/json" \
 		-d '{"input":"$(INPUT_TEXT)","ref_audio":"$(B64)","ref_text":"$(REF_TEXT)","x_vector_only_mode":false}' \

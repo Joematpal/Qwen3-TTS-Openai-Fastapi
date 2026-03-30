@@ -9,9 +9,8 @@ services:
       target: production
     container_name: qwen3-tts-api
     runtime: nvidia
-    network_mode: host
-    ports:
-      - "8880:8880"
+    expose:
+      - "8880"
     environment:
       - HOST=0.0.0.0
       - PORT=8880
@@ -33,12 +32,39 @@ services:
               device_ids: ['1']
               capabilities: [gpu]
     restart: unless-stopped
+    networks:
+      - tts-internal
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8880/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 120s
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:latest
+    container_name: qwen3-tts-auth
+    ports:
+      - "8880:4180"
+    environment:
+      - OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180
+      - OAUTH2_PROXY_PROVIDER=oidc
+      - OAUTH2_PROXY_OIDC_ISSUER_URL=${OIDC_ISSUER_URL}
+      - OAUTH2_PROXY_CLIENT_ID=${OIDC_CLIENT_ID}
+      - OAUTH2_PROXY_CLIENT_SECRET=${OIDC_CLIENT_SECRET}
+      - OAUTH2_PROXY_REDIRECT_URL=${OIDC_REDIRECT_URL}
+      - OAUTH2_PROXY_COOKIE_SECRET=${OAUTH2_COOKIE_SECRET}
+      - OAUTH2_PROXY_COOKIE_SECURE=false
+      - OAUTH2_PROXY_EMAIL_DOMAINS=*
+      - OAUTH2_PROXY_UPSTREAM=http://qwen3-tts-api:8880
+      - OAUTH2_PROXY_SKIP_AUTH_ROUTES=^/health$
+      - OAUTH2_PROXY_PASS_ACCESS_TOKEN=true
+      - OAUTH2_PROXY_SET_XAUTHREQUEST=true
+    depends_on:
+      - qwen3-tts-gpu
+    restart: unless-stopped
+    networks:
+      - tts-internal
 
   # GPU-enabled service with vLLM-Omni backend
   qwen3-tts-vllm:
@@ -110,6 +136,10 @@ services:
     profiles:
       - cpu
 
-# To run GPU version with official backend: docker-compose up qwen3-tts-gpu
+networks:
+  tts-internal:
+    driver: bridge
+
+# To run GPU version with official backend: docker-compose up qwen3-tts-gpu oauth2-proxy
 # To run GPU version with vLLM backend: docker-compose --profile vllm up qwen3-tts-vllm
 # To run CPU version: docker-compose --profile cpu up qwen3-tts-cpu
