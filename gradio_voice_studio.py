@@ -203,7 +203,9 @@ def data_uri_from_file(file_path: Path) -> str:
 def write_bytes_to_temp_audio(content: bytes, ext: str) -> str:
     """Write raw audio bytes to a temporary file and return its path."""
     ext = ext.lstrip(".")
-    fd, path = tempfile.mkstemp(suffix=f".{ext}")
+    tmp_dir = os.environ.get("GRADIO_TEMP_DIR") or tempfile.gettempdir()
+    Path(tmp_dir).mkdir(parents=True, exist_ok=True)
+    fd, path = tempfile.mkstemp(suffix=f".{ext}", dir=tmp_dir)
     os.close(fd)
     Path(path).write_bytes(content)
     return path
