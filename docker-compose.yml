@@ -49,6 +49,7 @@ services:
     command:
       - --upstream=http://qwen3-tts-api:8880/
     environment:
+      - OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180
       - OAUTH2_PROXY_PROVIDER=oidc
       - OAUTH2_PROXY_OIDC_ISSUER_URL=${OIDC_ISSUER_URL}
       - OAUTH2_PROXY_CLIENT_ID=${OIDC_CLIENT_ID}
