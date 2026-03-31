@@ -222,8 +222,7 @@ if ENABLE_VOICE_STUDIO:
             voice_studio_app = build_app(base_url, VOICE_LIBRARY_DIR)
             
             # Mount the Gradio app
-            gradio_tmp = os.environ.get("GRADIO_TEMP_DIR", "/tmp/gradio")
-            app = gr.mount_gradio_app(app, voice_studio_app, path="/voice-studio", allowed_paths=[gradio_tmp])
+            app = gr.mount_gradio_app(app, voice_studio_app, path="/voice-studio")
             logger.info(f"Voice Studio mounted at /voice-studio")
         except Exception as e:
             logger.warning(f"Failed to mount Voice Studio: {e}")
