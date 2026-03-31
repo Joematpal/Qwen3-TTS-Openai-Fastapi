@@ -36,6 +36,6 @@ output/
 *.aac
 *.opus
 
-
+.env
 # LLM infra
 CLAUDE.md
