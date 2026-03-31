@@ -96,7 +96,9 @@ RUN pip install --no-cache-dir \
     python-multipart \
     pydantic>=2.0.0 \
     inflect \
-    aiofiles
+    aiofiles \
+    gradio>=4.0.0 \
+    httpx
 
 # Install ninja for faster flash-attn compilation
 RUN pip install --no-cache-dir ninja packaging wheel
